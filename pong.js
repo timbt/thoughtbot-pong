@@ -32,5 +32,6 @@ function main (){
 	var ctx = canvas.getContext('2d');
 
 	var paddle1 = new paddle(25,275,ctx);
-	
+	var paddle2 = new paddle(765,275,ctx);
+	document.onkeydown  
 }
