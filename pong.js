@@ -14,7 +14,7 @@ canvas.width = CANVAS_WIDTH;
 canvas.height = CANVAS_HEIGHT;
 var context = canvas.getContext('2d');
 
-//Sexy objects
+//Object definitions
 function Paddle(x,y,width,height){
 	this.x = x;
 	this.y = y;
@@ -45,7 +45,7 @@ Computer.prototype.render = function(){
 	this.paddle.render();
 };
 
-//Ballin'
+
 function Ball (x,y){
 	this.x = x;
 	this.y = y;
@@ -64,16 +64,36 @@ Ball.prototype.render = function() {
 Ball.prototype.update = function() {
 	this.x += this.x_speed;
 	this.y += this.y_speed;
+	var top_x = this.x - 5;
+	var top_y = this.y - 5;
+	var bottom_x = this.x + 5;
+	var bottom_y = this.y + 5;
+
+	if (this.x - 5 < 0) { //left wall collision
+		this.x = 5;
+		this.x_speed = -this.x_speed;
+		}
+	else if (this.x + 5 > 400) { //right wall collision)
+		this.x = 395;
+		this.x_speed = -this.x_speed;
+		}
+
+	if (this.y < 0 || this.y > 600) { //top or bottom wall collision (reset)
+		this.x_speed = 0;
+		this.y_speed = 3;
+		this.x = 200;
+		this.y = 300;
+		} 
 };
 
-//Ay makin' da shit
+//Object creation
 var player = new Player();
 var computer = new Computer();
 var ball = new Ball(200, 300);
 
 //Important Functions and Stuff
 var update = function () {
-	ball.update();
+	ball.update(player.paddle,computer.paddle);
 };
 
 var render = function () {
