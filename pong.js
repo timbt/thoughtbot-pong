@@ -1,4 +1,4 @@
-//Constants
+				//Constants
 var CANVAS_WIDTH = 400;
 var CANVAS_HEIGHT = 600;
 
@@ -45,17 +45,43 @@ Computer.prototype.render = function(){
 	this.paddle.render();
 };
 
-var player = new Player;
-var computer = new Computer;
+//Ballin'
+function Ball (x,y){
+	this.x = x;
+	this.y = y;
+	this.x_speed = 0;
+	this.y_speed = 3;
+	this.radius = 5;
+}
+
+Ball.prototype.render = function() {
+	context.beginPath();
+	context.arc(this.x, this.y, this.radius, 2 * Math.PI, false);
+	context.fillStyle = "#000000";
+	context.fill();
+};
+
+Ball.prototype.update = function() {
+	this.x += this.x_speed;
+	this.y += this.y_speed;
+};
+
+//Ay makin' da shit
+var player = new Player();
+var computer = new Computer();
+var ball = new Ball(200, 300);
 
 //Important Functions and Stuff
-var update = function () {};
+var update = function () {
+	ball.update();
+};
 
 var render = function () {
 	context.fillStyle = "#FF00FF";
 	context.fillRect(0,0,CANVAS_WIDTH,CANVAS_HEIGHT);
 	player.render();
 	computer.render();
+	ball.render();
 };
 
 var step = function (){
