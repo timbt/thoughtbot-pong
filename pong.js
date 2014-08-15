@@ -8,6 +8,17 @@ var animate = window.requestAnimationFrame ||
 	window.webkitRequestAnimationFrame ||
 	function(callback) {window.setTimeout(callback, 1000 / 60)};
 
+//Keypress detection
+var keysDown = {};
+
+window.addEventListener("keydown", function(event){
+	keysDown[event.keyCode] = true;
+});
+
+window.addEventListener("keyup", function(event){
+	delete keysDown[event.keyCode];	
+});
+
 //Create canvas
 var canvas = document.createElement('canvas');
 canvas.width = CANVAS_WIDTH;
@@ -15,6 +26,8 @@ canvas.height = CANVAS_HEIGHT;
 var context = canvas.getContext('2d');
 
 //Object definitions
+
+//Paddle
 function Paddle(x,y,width,height){
 	this.x = x;
 	this.y = y;
@@ -29,6 +42,22 @@ Paddle.prototype.render = function() {
 	context.fillRect(this.x, this.y, this.width, this.height);	
 };
 
+Paddle.prototype.move = function (x, y) {
+	this.x += x;
+	this.y += y;
+	this.x_speed = x;
+	this.y_speed = y;
+	if (this.x < 0) { //left wall collision
+		this.x = 0;
+		this.x_speed = 0;
+	}
+	else if (this.x + this.width > 400) { //right wall collision
+		this.x = 400 - this.width;
+		this.x_speed = 0;
+	}
+}
+
+//Player
 function Player() {
 	this.paddle = new Paddle(175,580,50,10);
 }
@@ -37,6 +66,22 @@ Player.prototype.render = function() {
 	this.paddle.render();
 };
 
+Player.prototype.update = function() {
+	for (var key in keysDown) {
+		var value = Number(key);
+		if (value == 37) { //left arrow
+			this.paddle.move(-4,0);
+		}
+		else if (value == 39) {//right arrow
+			this.paddle.move(4,0);
+		}
+		else {
+			this.paddle.move(0,0);
+		}
+	}
+};
+
+//Computer
 function Computer() {
 	this.paddle = new Paddle(175,10,50,10);
 }
@@ -45,7 +90,20 @@ Computer.prototype.render = function(){
 	this.paddle.render();
 };
 
+Computer.prototype.update = function(ball) {
+	var x_pos = ball.x;
+	var diff = -((this.paddle.x + this.paddle.width / 2 ) - x_pos);
+	if (diff <= -4){ //max speed left
+		diff = -4;
+	}
+	else if (diff >= 4){ //max speed right
+		diff = 4;
+	}
 
+this.paddle.move(diff, 0);
+};
+
+//Ball
 function Ball (x,y){
 	this.x = x;
 	this.y = y;
@@ -106,6 +164,8 @@ var ball = new Ball(200, 300);
 //Important Functions and Stuff
 var update = function () {
 	ball.update(player.paddle,computer.paddle);
+	player.update();
+	computer.update(ball);
 };
 
 var render = function () {
